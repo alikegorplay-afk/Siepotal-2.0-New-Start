@@ -33,7 +33,8 @@ async def getter_items(node_id: int | str, func: Awaitable, writer: CsvWriter):
 async def process_node(node_id: str | int, tree_api: TreeAPI, product_api: ProductAPI, writer: CsvWriter):
     """Обрабатывает один узел и возвращает список дочерних узлов"""
     node_info = await tree_api.get_node_info(node_id)
-    
+    if node_info is None:
+        return
     if node_info.save_product:
         await getter_items(node_id, product_api.get_node_products, writer)
     if node_info.save_accessory:
@@ -81,7 +82,8 @@ async def main():
         for node_id in (9990173, 10045207, 10313567, 10047631, 10008397):
             logger.info(f"Старт {node_id}!")
             await spider(node_id, tree_api, product_api, writer, max_concurrent=8)
-    
+        else:
+            logger.info(f"{tree_api.requests.get_stats()}, {tree_api.requests.get_stats()}!")
     await writer.save()
 
 if __name__ == "__main__":
