@@ -41,7 +41,7 @@ class requests:
         
         self.max_try = max_try
         self.session = session
-        self.token = token
+        self.token = token or Token(session)
         
         self.proxy_list = cycle(proxy_list if proxy_list else [])
         self.use_proxy = use_proxy
@@ -74,12 +74,13 @@ class requests:
                 
                 elif error.status == HTTPStatus.UNAUTHORIZED:
                     logger.info(f"401 - для '{current_node}' попытка {self.max_try - current_requests} из {self.max_try}")
-                    await self.token.update()
+                    await self.token.update(self.current_proxy)
                 
                 elif error.status == HTTPStatus.FORBIDDEN:
                     logger.warning(f"403 - для '{current_node}' попытка {self.max_try - current_requests} из {self.max_try}")
                     if self.use_proxy and self.proxy_list:
                         self.current_proxy = next(self.proxy_list)
+                        await self.token.update(self.current_proxy)
                         logger.info(f"Используем прокси: {self.current_proxy}")
                         
                 elif 500 <= error.status <= 599:

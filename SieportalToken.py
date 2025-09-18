@@ -61,11 +61,11 @@ class Token:
         
         return time.time() < (self._expires_at - 10)
 
-    async def update(self) -> bool:
+    async def update(self, proxy: str = None) -> bool:
         """Принудительно обновляет токен не зависимо от его времени 'Жизни'"""
         return await self.get_token(False)
     
-    async def get_token(self, check_valid: bool = True) -> str:
+    async def get_token(self, check_valid: bool = True, proxy: str = None) -> str:
         """Получает новый токен или возвращает существующий валидный
         
         Returns:
@@ -82,7 +82,7 @@ class Token:
                 self.URL, 
                 data=self._data,
                 headers=self._headers_generator.generate(),
-                proxy=self.proxy,
+                proxy=proxy,
                 timeout=aiohttp.ClientTimeout(total=30)
             ) as response:
                 
