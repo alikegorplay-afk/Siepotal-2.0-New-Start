@@ -60,7 +60,7 @@ class requests:
                     url, 
                     *args, **kwargs,
                     proxy = self.current_proxy,
-                    headers = await self.token.get_headers()
+                    headers = await self.token.get_headers(self.current_proxy)
                 ) as response:
                     response.raise_for_status()
                     logger.info(f"200 - для '{current_node}'")
@@ -80,7 +80,6 @@ class requests:
                     logger.warning(f"403 - для '{current_node}' попытка {self.max_try - current_requests} из {self.max_try}")
                     if self.use_proxy and self.proxy_list:
                         self.current_proxy = next(self.proxy_list)
-                        await self.token.update(self.current_proxy)
                         logger.info(f"Используем прокси: {self.current_proxy}")
                         
                 elif 500 <= error.status <= 599:

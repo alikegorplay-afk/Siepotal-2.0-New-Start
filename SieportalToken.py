@@ -63,7 +63,7 @@ class Token:
 
     async def update(self, proxy: str = None) -> bool:
         """Принудительно обновляет токен не зависимо от его времени 'Жизни'"""
-        return await self.get_token(False)
+        return await self.get_token(proxy)
     
     async def get_token(self, check_valid: bool = True, proxy: str = None) -> str:
         """Получает новый токен или возвращает существующий валидный
@@ -104,11 +104,11 @@ class Token:
             logger.error("Таймаут при получении токена")
             raise
 
-    async def get_headers(self) -> Dict[str, str]:
+    async def get_headers(self, proxy: Optional[str] = None) -> Dict[str, str]:
         """Возвращает заголовки с актуальным токеном
         
         Returns:
             Dict[str, str]: Заголовки для HTTP запросов
         """
-        token = await self.get_token()
+        token = await self.get_token(proxy)
         return self._headers_generator.generate() | {'Authorization': token}

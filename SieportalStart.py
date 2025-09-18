@@ -1,4 +1,5 @@
 import os
+import logging
 import asyncio
 from typing import Awaitable
 from pathlib import Path
@@ -11,6 +12,13 @@ from SieportalWriter import CsvWriter
 
 dotenv.load_dotenv()
 PROXY_LIST = os.getenv("PROXY").split(',')
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(levelname)s] - %(message)s | %(asctime)s"
+)
+
+logger = logging.getLogger(__name__)
 
 async def getter_items(node_id: int | str, func: Awaitable, writer: CsvWriter):
     page = 0
@@ -63,13 +71,15 @@ async def main():
             'language': DEFAULT_LANGUAGE, 
             'region': DEFAULT_REGION,
             'proxy_list': PROXY_LIST,
-            'use_proxy': True
+            'use_proxy': True,
+            'max_try': 3
         }
         tree_api = TreeAPI(**SETTING)
         product_api = ProductAPI(**SETTING)
         writer = CsvWriter(FILE_PATH)
         
         for node_id in (9990173, 10045207, 10313567, 10047631, 10008397):
+            logger.info(f"Старт {node_id}!")
             await spider(node_id, tree_api, product_api, writer, max_concurrent=8)
     
     await writer.save()
