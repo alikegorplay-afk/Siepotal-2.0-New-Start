@@ -1,5 +1,6 @@
-.env
+*.env
 /files
 /__pycache__
 *.pyc
 venv
+test.py
