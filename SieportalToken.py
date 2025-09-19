@@ -63,6 +63,8 @@ class Token:
 
     async def update(self, proxy: str = None) -> bool:
         """Принудительно обновляет токен не зависимо от его времени 'Жизни'"""
+        self._token = None  # Сбрасываем текущий токен
+        self._expires_at = None
         return await self.get_token(proxy)
     
     async def get_token(self, check_valid: bool = True, proxy: str = None) -> str:
@@ -82,7 +84,7 @@ class Token:
                 self.URL, 
                 data=self._data,
                 headers=self._headers_generator.generate(),
-                proxy=proxy,
+                proxy=proxy or self.proxy,
                 timeout=aiohttp.ClientTimeout(total=30)
             ) as response:
                 
@@ -110,5 +112,5 @@ class Token:
         Returns:
             Dict[str, str]: Заголовки для HTTP запросов
         """
-        token = await self.get_token(proxy)
+        token = await self.get_token(proxy = proxy)
         return self._headers_generator.generate() | {'Authorization': token}

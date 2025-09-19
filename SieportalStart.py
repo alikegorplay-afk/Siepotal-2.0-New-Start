@@ -73,7 +73,7 @@ async def main():
             'region': DEFAULT_REGION,
             'proxy_list': PROXY_LIST,
             'use_proxy': True,
-            'max_try': 3
+            'max_try': 20
         }
         tree_api = TreeAPI(**SETTING)
         product_api = ProductAPI(**SETTING)
