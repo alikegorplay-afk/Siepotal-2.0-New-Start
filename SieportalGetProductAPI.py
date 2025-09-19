@@ -37,6 +37,7 @@ class GetTreeAPI:
         Args:
         
             node_id: [int] ссылка на ветвь пример .../10539284?tree=CatalogTree#productVariants здесь 10539284 это node_id
+            
             page_number: [int] это номер страницы
             
         Returns:

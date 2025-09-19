@@ -49,7 +49,13 @@ class requests:
         
     async def request(self, method: str, url: str, *args, **kwargs) -> Optional[Dict[str, Any]]:
         current_requests = self.max_try
-        current_node = find_first_key(kwargs, 'NodeId') or url
+        
+        if (node := find_first_key(kwargs, 'NodeId')):
+            current_node = "ветки: {}".format(node)
+        elif (product := find_first_key(kwargs, 'nodeId')):
+            current_node = "Продукты: {}".format(product)
+        else:
+            current_node = url
         
         while current_requests != 0:
             current_requests -= 1
@@ -121,4 +127,3 @@ class requests:
             "success_requests": success_requests,
             "success_rate": round(success_rate, 2)
         }
-        
