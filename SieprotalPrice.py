@@ -18,9 +18,8 @@ class GetPriceAPI(BaseAPI):
     
     async def get_pice(self, article: str, currency_code: str) -> Optional[NodeProduct]:
         URL = 'https://sieportal.siemens.com/api/mall/ProductInformation/GetProductsAndPrices'
-        json_data = {
+        json_data = self._default_params({
             'countryCode': self.region,
-            'language': self.language,
             'products': [
                 {
                     'itemId': '1',
@@ -28,9 +27,8 @@ class GetPriceAPI(BaseAPI):
                 }
             ],
             'currencyCode': currency_code,
-            'regionId': self.region,
             'projectNumber': None,
-        }
+        })
         
         data = await self.requests.post(URL, json = json_data)
         return NodeProduct(

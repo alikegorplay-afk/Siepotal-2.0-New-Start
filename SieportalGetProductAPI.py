@@ -78,9 +78,8 @@ class GetProductAPI(BaseAPI):
         ) if response is not None else None
     
     def _default_params(self, new_dict: Dict[str, Any]):
-        return {
-            'RegionId': self.region,
-            'Language': self.language,
-            'treeName': 'CatalogTree',
-            'limit': 50,
-        } | new_dict
+        return super()._default_params(
+            {
+                'treeName': 'CatalogTree',
+                'limit': 50,
+            } | new_dict)

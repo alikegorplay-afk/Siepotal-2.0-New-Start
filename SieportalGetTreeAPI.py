@@ -6,6 +6,8 @@ import aiohttp
 
 from SieportalTyping import NodeInfo, NodeChild, BaseAPI
 
+logger = logging.getLogger(__name__)
+
 class GetTreeAPI(BaseAPI):
     def __init__(
         self, 
@@ -45,8 +47,5 @@ class GetTreeAPI(BaseAPI):
             logging.error(error)
             return None
         
-    def _default_params(self, new_dict: Dict[str, Any]):
-        return {
-            'RegionId': self.region,
-            'Language': self.language,
-        } | new_dict
+        except Exception as e:
+            logger.exception(f"Неизвестная ошибка в GetTreeAPI: {e}")

@@ -105,34 +105,52 @@ async def spider(node_id: str | int, tree_api: TreeAPI, product_api: ProductAPI,
         await asyncio.gather(*tasks)
 
 async def main():
+    global writer
     args = parse()
-    
+
     DEFAULT_REGION: str = args.region
     DEFAULT_LANGUAGE = args.language
     FILE_PATH = Path("files") / f"{DEFAULT_LANGUAGE}-{DEFAULT_REGION}.csv"
-    
-    async with aiohttp.ClientSession() as session:
-        SETTING = {
-            'session': session, 
-            'language': DEFAULT_LANGUAGE, 
-            'region': DEFAULT_REGION,
-            'proxy_list': PROXY_LIST,
-            'use_proxy': args.proxy,
-            'max_try': args.max_try,
-            'sleep_time': args.sleep
-        }
-        tree_api = TreeAPI(**SETTING)
-        product_api = ProductAPI(**SETTING)
+
+    try:
         writer = CsvWriter(FILE_PATH)
+    except Exception as e:
+        logger.exception(f"Ошибка при инициализации {e}")
+        raise e
+
+    try:
         
-        for node_id in args.nodes:
-            logger.info(f"Старт обработки узла {node_id}!")
-            await spider(node_id, tree_api, product_api, writer, max_concurrent= args.concurrent)
-        
-        logger.info(f"РЕЗУЛЬТАТ: {tree_api.requests.get_stats()}, {product_api.requests.get_stats()}!")
+        print(args.proxy, type(args.proxy))
+
+        async with aiohttp.ClientSession() as session:
+            SETTING = {
+                'session': session, 
+                'language': DEFAULT_LANGUAGE, 
+                'region': DEFAULT_REGION,
+                'proxy_list': PROXY_LIST,
+                'use_proxy': args.proxy,
+                'max_try': args.max_try,
+                'sleep_time': args.sleep
+            }
+            tree_api = TreeAPI(**SETTING)
+            product_api = ProductAPI(**SETTING)
+            for node_id in args.nodes:
+                logger.info(f"Старт обработки узла {node_id}!")
+                await spider(node_id, tree_api, product_api, writer, max_concurrent= args.concurrent)
+            
+            logger.info(f"РЕЗУЛЬТАТ: {tree_api.requests.get_stats()}, {product_api.requests.get_stats()}!")
+    
+    except Exception as e:
+        logger.exception(e)
+        await writer.save()
+        raise e
    
-    await writer.save()
-    logger.info("Парсинг завершен!")
+    finally:
+        await writer.save()
+        logger.info("Парсинг завершен!")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logger.info("Парсинг остоновлен досрочно пользователем!")

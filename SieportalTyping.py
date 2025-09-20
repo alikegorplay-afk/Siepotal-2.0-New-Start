@@ -1,7 +1,7 @@
 import aiohttp
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 from SieportalToken import Token
 from SieportalRequests import requests
@@ -27,6 +27,13 @@ class BaseAPI:
         self.region = region
         self.token = Token(session)
         self.requests = requests(self._session, self.token, max_try = max_try, proxy_list=proxy_list, use_proxy=use_proxy, sleep_time=sleep_time)
+
+    
+    def _default_params(self, new_dict: Dict[str, Any]):
+        return {
+            'RegionId': self.region,
+            'Language': self.language,
+        } | new_dict
 
 @dataclass
 class BaseChild:

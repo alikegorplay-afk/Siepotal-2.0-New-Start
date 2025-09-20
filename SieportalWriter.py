@@ -1,6 +1,7 @@
 import logging
 
 from typing import List
+from pathlib import Path
 
 import aiocsv
 import aiofiles
@@ -15,12 +16,14 @@ logger = logging.getLogger(__name__)
 class CsvWriter:
     def __init__(
         self,
-        file_name: str,
+        fp: str | Path,
         buffer: int = 500,
     ):
         self.buffer_size = buffer
-        self.file_name = file_name
+        self.fp = Path(fp)
+        self.fp.parent.mkdir(parents=True, exist_ok=True)
         
+
         self.buffer: List[str | int] = list()
         
     async def add(self, item: str | int):
@@ -30,7 +33,7 @@ class CsvWriter:
     
     async def save(self):
         logger.info(f"Сохранения {len(self.buffer)} элементов...")
-        async with aiofiles.open(self.file_name, 'a', newline='') as file:
+        async with aiofiles.open(self.fp, 'a', newline='') as file:
             _writer = aiocsv.AsyncWriter(file)
             await _writer.writerows(self.buffer)
         self.flush()
