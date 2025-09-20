@@ -65,7 +65,7 @@ class Token:
         """Принудительно обновляет токен не зависимо от его времени 'Жизни'"""
         self._token = None  # Сбрасываем текущий токен
         self._expires_at = None
-        return await self.get_token(proxy)
+        return await self.get_token(proxy = proxy or self.proxy)
     
     async def get_token(self, check_valid: bool = True, proxy: str = None) -> str:
         """Получает новый токен или возвращает существующий валидный
