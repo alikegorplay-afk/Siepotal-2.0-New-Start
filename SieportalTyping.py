@@ -1,5 +1,32 @@
+import aiohttp
+
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
+
+from SieportalToken import Token
+from SieportalRequests import requests
+
+
+class BaseAPI:
+    def __init__(
+        self, 
+        session: aiohttp.ClientSession,
+        language: str,
+        region: str,
+        *,
+        proxy_list: Optional[List[str]] = None,
+        use_proxy: bool = False,
+        sleep_time: float | int = 1.0,
+        max_try: int = 3
+    ):
+        self._session: aiohttp.ClientSession = session
+        self.proxy_list: list[str] = proxy_list
+        self.use_proxy: bool = use_proxy
+        
+        self.language = language
+        self.region = region
+        self.token = Token(session)
+        self.requests = requests(self._session, self.token, max_try = max_try, proxy_list=proxy_list, use_proxy=use_proxy, sleep_time=sleep_time)
 
 @dataclass
 class BaseChild:
@@ -8,6 +35,10 @@ class BaseChild:
 @dataclass
 class NodeChild(BaseChild):
     save_product: bool
+
+@dataclass
+class PriceChild(BaseChild):
+    price: str
 
 @dataclass
 class NodeInfo:

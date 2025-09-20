@@ -10,7 +10,7 @@ import dotenv
 import argparse
 
 from SieportalGetTreeAPI import GetTreeAPI as TreeAPI
-from SieportalGetProductAPI import GetTreeAPI as ProductAPI
+from SieportalGetProductAPI import GetProductAPI as ProductAPI
 from SieportalTyping import NodeProduct
 from SieportalWriter import CsvWriter
 
@@ -81,7 +81,7 @@ async def process_node(node_id: str | int, tree_api: TreeAPI, product_api: Produ
     if node_info.save_product:
         await getter_items(node_id, product_api.get_node_products, writer)
     if node_info.save_accessory:
-        await getter_items(node_id, product_api.get_node_accesories, writer)
+        await getter_items(node_id, product_api.get_node_accessories, writer)
     
     return [child.node_id for child in node_info.children]
 

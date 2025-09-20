@@ -2,11 +2,9 @@ from typing import List, Optional, Dict, Any
 
 import aiohttp
 
-from SieportalRequests import requests
-from SieportalToken import Token
-from SieportalTyping import NodeProduct, BaseChild
+from SieportalTyping import NodeProduct, BaseChild, BaseAPI
 
-class GetTreeAPI:
+class GetProductAPI(BaseAPI):
     def __init__(
         self, 
         session: aiohttp.ClientSession,
@@ -15,17 +13,9 @@ class GetTreeAPI:
         *,
         proxy_list: Optional[List[str]] = None,
         use_proxy: bool = False,
-        sleep_time: float | int = 1.0,
-        max_try: int = 3
-    ):
-        self._session: aiohttp.ClientSession = session
-        self.proxy_list: list[str] = proxy_list
-        self.use_proxy: bool = use_proxy
-        
-        self.language = language
-        self.region = region
-        self.token = Token(session)
-        self.requests = requests(self._session, self.token, max_try = max_try, proxy_list=proxy_list, use_proxy=use_proxy, sleep_time=sleep_time)
+        sleep_time = 1,
+        max_try = 3):
+        super().__init__(session, language, region, proxy_list=proxy_list, use_proxy=use_proxy, sleep_time=sleep_time, max_try=max_try)
     
     async def get_node_products(
         self, 
@@ -58,11 +48,11 @@ class GetTreeAPI:
             response.get('productCount', 0)
         ) if response is not None else None
     
-    async def get_node_accesories(
+    async def get_node_accessories(
         self,
         node_id: int | str,
         page_number: int | str = 0
-    ) -> NodeProduct:
+    ) -> Optional[NodeProduct]:
         """get_node_accesories получает АКСЕССУАРЫ продукта из каталога
         
         Args:

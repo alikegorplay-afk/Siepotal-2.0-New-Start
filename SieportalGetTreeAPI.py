@@ -4,11 +4,9 @@ from typing import List, Dict, Optional, Any
 
 import aiohttp
 
-from SieportalTyping import NodeInfo, NodeChild
-from SieportalToken import Token
-from SieportalRequests import requests
+from SieportalTyping import NodeInfo, NodeChild, BaseAPI
 
-class GetTreeAPI:
+class GetTreeAPI(BaseAPI):
     def __init__(
         self, 
         session: aiohttp.ClientSession,
@@ -17,17 +15,9 @@ class GetTreeAPI:
         *,
         proxy_list: Optional[List[str]] = None,
         use_proxy: bool = False,
-        sleep_time: float | int = 1.0,
-        max_try: int = 3
-    ):
-        self._session: aiohttp.ClientSession = session
-        self.proxy_list: list[str] = proxy_list
-        self.use_proxy: bool = use_proxy
-        
-        self.language = language
-        self.region = region
-        self.token = Token(session)
-        self.requests = requests(self._session, self.token, max_try = max_try, proxy_list=proxy_list, use_proxy=use_proxy, sleep_time=sleep_time)
+        sleep_time = 1,
+        max_try = 3):
+        super().__init__(session, language, region, proxy_list=proxy_list, use_proxy=use_proxy, sleep_time=sleep_time, max_try=max_try)
     
     async def get_node_info(self, node_id: int | str) -> Optional[NodeInfo]:
         """Получает информацию о узле каталога по его ID"""
