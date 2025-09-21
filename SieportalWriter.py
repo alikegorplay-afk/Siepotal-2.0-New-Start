@@ -26,8 +26,11 @@ class CsvWriter:
 
         self.buffer: List[str | int] = list()
         
-    async def add(self, item: str | int):
-        self.buffer.append([item])
+    async def add(self, item: List[str] | str | int):
+        if isinstance(item, list):
+            self.buffer.append(item)
+        else:
+            self.buffer.append([item])
         if len(self.buffer) >= self.buffer_size:
             await self.save()
     

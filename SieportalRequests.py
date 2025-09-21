@@ -54,6 +54,8 @@ class requests:
             current_node = "ветки: {}".format(node)
         elif (product := find_first_key(kwargs, 'nodeId')):
             current_node = "{}: {}, page: {}".format(url, product, find_first_key(kwargs, 'pageNumberIndex'))
+        elif (product := find_first_key(kwargs, 'articleNumber')):
+            current_node = "артикула: {}".format(product)
         else:
             current_node = url
         
