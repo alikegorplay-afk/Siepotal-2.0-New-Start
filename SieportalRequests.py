@@ -89,7 +89,11 @@ class requests:
                     if self.use_proxy and self.proxy_list:
                         self.current_proxy = next(self.proxy_list)
                         logger.info(f"Используем прокси: {self.current_proxy}")
-                        self.token.update(self.current_proxy)
+                        try:
+                            self.token.update(self.current_proxy)
+                        except aiohttp.ClientResponseError as e:
+                            if e.status == HTTPStatus.FORBIDDEN:
+                                continue
                         
                 elif 500 <= error.status <= 599:
                     logger.warning(f"Ошибка сервера попытка {self.max_try - current_requests} из {self.max_try} для {current_node}")

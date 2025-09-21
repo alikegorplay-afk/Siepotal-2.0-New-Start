@@ -1,5 +1,6 @@
 import asyncio
 import os
+import logging
 
 from SieprotalPrice import GetPriceAPI
 
@@ -13,6 +14,8 @@ from SieportalWriter import CsvWriter
 
 dotenv.load_dotenv()
 
+logger = logging.getLogger(__name__)
+
 PROXY_LIST = os.getenv("PROXY")
 PROXY_LIST = PROXY_LIST.split(',') if PROXY_LIST else []
 
@@ -23,16 +26,20 @@ async def main():
         csv = aiocsv.AsyncReader(file_read)
         async with aiohttp.ClientSession() as session:
             api = GetPriceAPI(session, 'en', 'kr', proxy_list=PROXY_LIST, use_proxy=True, sleep_time=0.5, max_try=round(len(PROXY_LIST) * 1.5))
-            await api.token.update()
             tasks = []
             
             async for line in csv:
-                tasks.append(asyncio.create_task(api.get_pice(line[0], "KRW")))
-                if len(tasks) >= 50:
-                    for response in await asyncio.gather(*tasks):
-                        response: NodeProduct
-                        await writer.add([response.products[0].node_id, response.products[0].price])
-                    tasks.clear()
+                if line and line[0]:  # Проверка на пустую строку
+                    tasks.append(asyncio.create_task(api.get_pice(line[0], "KRW")))
+                    if len(tasks) >= 50:
+                        results = await asyncio.gather(*tasks, return_exceptions=True)
+                        for response in results:
+                            if isinstance(response, Exception):
+                                logger.error(f"Ошибка при запросе: {response}")
+                                continue
+                            if response and response.products:
+                                await writer.add([response.products[0].node_id, response.products[0].price])
+                        tasks.clear()
 
     await writer.save()
     

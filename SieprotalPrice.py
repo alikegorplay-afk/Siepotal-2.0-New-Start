@@ -30,8 +30,19 @@ class GetPriceAPI(BaseAPI):
             'projectNumber': None,
         })
         
-        data = await self.requests.post(URL, json = json_data)
-        return NodeProduct(
-            [PriceChild(article, item['productPrice']['uiValueListPrice']) for item in data['products']],
-            len(data['products'])
-        ) if data is not None else None
+        data = await self.requests.post(URL, json=json_data)
+        
+        if data is None or 'products' not in data:
+            return None
+            
+        try:
+            products = []
+            for item in data['products']:
+                if 'productPrice' in item and 'uiValueListPrice' in item['productPrice']:
+                    products.append(PriceChild(article, item['productPrice']['uiValueListPrice']))
+            
+            return NodeProduct(
+                products,
+                len(products))
+        except (KeyError, TypeError):
+            return None

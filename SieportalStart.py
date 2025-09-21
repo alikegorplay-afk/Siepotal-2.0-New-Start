@@ -119,9 +119,6 @@ async def main():
         raise e
 
     try:
-        
-        print(args.proxy, type(args.proxy))
-
         async with aiohttp.ClientSession() as session:
             SETTING = {
                 'session': session, 
