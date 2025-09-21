@@ -101,11 +101,9 @@ class Token:
                 
         except aiohttp.ClientError as e:
             logger.error(f"Ошибка при получении токена: {e}")
-            raise e
         
         except asyncio.TimeoutError:
-            logger.error("Таймаут при получении токена")
-            raise e
+            logger.error(f"Таймаут при получении токена: {e}")
 
     async def get_headers(self, proxy: Optional[str] = None) -> Dict[str, str]:
         """Возвращает заголовки с актуальным токеном
